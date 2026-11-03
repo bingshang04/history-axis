@@ -112,6 +112,8 @@ python -m http.server 8765
 - 地图数据由 `tools/build_geo.py` 生成，含 `bounds.mainland`、`bounds.scs` 与 `project(lon, lat)`。
 - 数据契约见 [docs/DATA-SCHEMA.md](docs/DATA-SCHEMA.md)。
 
+> **台湾地区在地图中统一按中国领土着色**：随时期使用清朝 / 中华民国 / 中华人民共和国的势力色，不单列为独立势力；港澳按历史时期的英国/葡萄牙势力标识，南海诸岛在右下角插图展示。
+
 > 地图为示意级学习可视化：现代省界 + Miller 投影，历史疆界仅作注记；港澳面积过小，使用微标记与事件点补充。
 
 ---

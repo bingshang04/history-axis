@@ -25,7 +25,6 @@ window.SHIGANG_PERIODS = {
     ccp:        { name: "苏区 / 解放区", color: "#c14b35" },
     base:       { name: "抗日根据地", color: "#d0643f" },
     prc:        { name: "中华人民共和国", color: "#c47a3f" },
-    taiwan:     { name: "台湾地区", color: "#5f7182" }
   },
   periods: [
     {
@@ -69,7 +68,7 @@ window.SHIGANG_PERIODS = {
       summary: "《马关条约》割台湾；列强强租港湾、划分势力范围。",
       defaultForce: "qing",
       overrides: {
-        "台湾": "japan", "香港": "british", "辽宁": "russia",
+        "香港": "british", "辽宁": "russia",
         "山东": "germany", "广东": "france"
       },
       legend: ["qing", "japan", "russia", "germany", "france", "british"]
@@ -80,7 +79,7 @@ window.SHIGANG_PERIODS = {
       summary: "义和团与《辛丑条约》后，清廷推行新政；革命运动风起云涌。",
       defaultForce: "qing",
       overrides: {
-        "台湾": "japan", "香港": "british", "辽宁": "russia",
+        "香港": "british", "辽宁": "russia",
         "吉林": "russia", "黑龙江": "russia", "山东": "germany",
         "福建": "japan", "云南": "france", "广西": "france"
       },
@@ -91,7 +90,7 @@ window.SHIGANG_PERIODS = {
       boundaryNote: "中华民国 · 疆界示意",
       summary: "辛亥革命推翻清王朝，中华民国成立；袁世凯窃取革命果实。",
       defaultForce: "republic",
-      overrides: { "台湾": "japan", "香港": "british", "澳门": "portugal" },
+      overrides: { "香港": "british", "澳门": "portugal" },
       legend: ["republic", "japan", "british", "portugal"]
     },
     {
@@ -105,7 +104,7 @@ window.SHIGANG_PERIODS = {
         "安徽": "wan", "山东": "wan", "浙江": "wan", "福建": "wan",
         "云南": "yunnan", "贵州": "yunnan", "广西": "guangxi",
         "广东": "republic", "四川": "sichuan", "山西": "shanxi",
-        "台湾": "japan", "香港": "british", "澳门": "portugal"
+        "香港": "british", "澳门": "portugal"
       },
       legend: ["republic", "beiyang", "wan", "feng", "yunnan", "guangxi", "sichuan", "shanxi", "japan", "british", "portugal"]
     },
@@ -114,7 +113,7 @@ window.SHIGANG_PERIODS = {
       boundaryNote: "中华民国 · 疆界示意",
       summary: "南京国民政府形式统一全国；农村革命根据地开始创建。",
       defaultForce: "npc",
-      overrides: { "台湾": "japan", "香港": "british", "澳门": "portugal" },
+      overrides: { "香港": "british", "澳门": "portugal" },
       legend: ["npc", "japan", "british", "portugal"]
     },
     {
@@ -125,7 +124,7 @@ window.SHIGANG_PERIODS = {
       overrides: {
         "辽宁": "manchukuo", "吉林": "manchukuo", "黑龙江": "manchukuo",
         "江西": "ccp", "福建": "ccp",
-        "台湾": "japan", "香港": "british", "澳门": "portugal"
+        "香港": "british", "澳门": "portugal"
       },
       legend: ["npc", "manchukuo", "ccp", "japan", "british", "portugal"]
     },
@@ -140,7 +139,7 @@ window.SHIGANG_PERIODS = {
         "安徽": "japan", "江西": "japan", "湖北": "japan", "湖南": "japan",
         "福建": "japan", "广东": "japan", "河南": "japan",
         "陕西": "base", "山西": "base", "甘肃": "base", "宁夏": "base",
-        "台湾": "japan", "香港": "british", "澳门": "portugal"
+        "香港": "british", "澳门": "portugal"
       },
       legend: ["npc", "japan", "manchukuo", "base", "british", "portugal"]
     },
@@ -151,7 +150,7 @@ window.SHIGANG_PERIODS = {
       defaultForce: "npc",
       overrides: {
         "陕西": "ccp", "山西": "ccp", "河北": "ccp", "山东": "ccp",
-        "台湾": "npc", "香港": "british", "澳门": "portugal"
+        "香港": "british", "澳门": "portugal"
       },
       legend: ["npc", "ccp", "british", "portugal"]
     },
@@ -164,7 +163,7 @@ window.SHIGANG_PERIODS = {
         "黑龙江": "ccp", "吉林": "ccp", "辽宁": "ccp",
         "河北": "ccp", "山西": "ccp", "山东": "ccp", "河南": "ccp",
         "陕西": "ccp", "安徽": "ccp", "江苏": "ccp",
-        "台湾": "npc", "香港": "british", "澳门": "portugal"
+        "香港": "british", "澳门": "portugal"
       },
       legend: ["npc", "ccp", "british", "portugal"]
     },
@@ -173,40 +172,40 @@ window.SHIGANG_PERIODS = {
       boundaryNote: "中华人民共和国 · 现代省界",
       summary: "中华人民共和国成立，完成社会主义改造，探索社会主义建设道路。",
       defaultForce: "prc",
-      overrides: { "台湾": "taiwan", "香港": "british", "澳门": "portugal" },
-      legend: ["prc", "taiwan", "british", "portugal"]
+      overrides: { "香港": "british", "澳门": "portugal" },
+      legend: ["prc", "british", "portugal"]
     },
     {
       id: "p15", from: 1978, to: 1997, era: "新中国 · 改革开放",
       boundaryNote: "中华人民共和国 · 现代省界",
       summary: "十一届三中全会开启改革开放；经济特区与沿海开放城市先行。",
       defaultForce: "prc",
-      overrides: { "台湾": "taiwan", "香港": "british", "澳门": "portugal" },
-      legend: ["prc", "taiwan", "british", "portugal"]
+      overrides: { "香港": "british", "澳门": "portugal" },
+      legend: ["prc", "british", "portugal"]
     },
     {
       id: "p16", from: 1997, to: 1999, era: "新中国 · 香港回归",
       boundaryNote: "中华人民共和国 · 现代省界",
       summary: "1997年香港回归祖国，“一国两制”付诸实践。",
       defaultForce: "prc",
-      overrides: { "台湾": "taiwan", "澳门": "portugal" },
-      legend: ["prc", "taiwan", "portugal"]
+      overrides: { "澳门": "portugal" },
+      legend: ["prc", "portugal"]
     },
     {
       id: "p17", from: 1999, to: 2012, era: "新中国 · 世纪之交",
       boundaryNote: "中华人民共和国 · 现代省界",
       summary: "澳门回归、加入世界贸易组织，综合国力快速提升。",
       defaultForce: "prc",
-      overrides: { "台湾": "taiwan" },
-      legend: ["prc", "taiwan"]
+      overrides: {},
+      legend: ["prc"]
     },
     {
       id: "p18", from: 2012, to: 2025, era: "新时代 · 中国特色社会主义",
       boundaryNote: "中华人民共和国 · 现代省界",
       summary: "中国特色社会主义进入新时代，全面建成小康社会，推进中国式现代化。",
       defaultForce: "prc",
-      overrides: { "台湾": "taiwan" },
-      legend: ["prc", "taiwan"]
+      overrides: {},
+      legend: ["prc"]
     }
   ]
 };
