@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>CHINA_GEO 质检预览</title>
+<style>
+  :root {
+    --bg: #0a0d13;
+    --panel: #131924;
+    --line: #24303f;
+    --text: #cfd8e3;
+    --dim: #7d8b9c;
+    --land: #b08d5b;
+    --land-hi: #d8b26e;
+    --stroke: #6f5836;
+    --nine: #e8d8a8;
+    --city: #4fd1c5;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font: 13px/1.5 "Segoe UI", "Microsoft YaHei", system-ui, sans-serif; }
+  .wrap { display: flex; gap: 16px; padding: 16px; align-items: flex-start; }
+  .mapbox { position: relative; border: 1px solid var(--line); background: #0d1118;
+    border-radius: 8px; overflow: hidden; flex: 0 0 auto; }
+  svg { display: block; }
+  .prov { fill: var(--land); stroke: var(--stroke); stroke-width: .8;
+    stroke-linejoin: round; cursor: pointer; transition: fill .12s linear; }
+  .prov:hover, .prov.hot { fill: var(--land-hi); stroke: #f0d9a8; stroke-width: 1.1; }
+  .nine { fill: none; stroke: var(--nine); stroke-width: 1.7; stroke-linecap: round; }
+  .lbl { fill: #251b0d; font-size: 11px; font-weight: 600; text-anchor: middle;
+    dominant-baseline: middle; pointer-events: none; paint-order: stroke;
+    stroke: rgba(240, 222, 180, .5); stroke-width: 2.2px; letter-spacing: .3px; }
+  .center-dot { fill: #ff3d3d; }
+  .center-cross { stroke: #ff3d3d; stroke-width: .7; opacity: .85; }
+  .city-dot { fill: var(--city); stroke: #04120f; stroke-width: 1; }
+  .city-ring { fill: none; stroke: var(--city); stroke-width: .9; opacity: .55; }
+  .city-lbl { fill: var(--city); font-size: 9.5px; text-anchor: start;
+    dominant-baseline: middle; paint-order: stroke; stroke: rgba(4, 10, 8, .85);
+    stroke-width: 2.4px; pointer-events: none; }
+  .grid { stroke: #1a2330; stroke-width: .5; shape-rendering: crispEdges; }
+  .grid.major { stroke: #24303f; }
+  .grid-lbl { fill: #4a5a6e; font-size: 8px; }
+  .frame { fill: none; stroke: #33455c; stroke-width: 1; }
+  .boundsbox { fill: none; stroke: #4fd1c5; stroke-width: .8; stroke-dasharray: 4 3; opacity: .5; }
+  #tip { position: absolute; left: 0; top: 0; pointer-events: none; display: none;
+    background: rgba(9, 14, 21, .95); border: 1px solid #3a4a5e; border-radius: 6px;
+    padding: 6px 9px; font-size: 12px; line-height: 1.45; white-space: nowrap;
+    box-shadow: 0 6px 20px rgba(0,0,0,.55); z-index: 5; }
+  #tip b { color: #f0d9a8; font-weight: 600; }
+  #tip .k { color: var(--dim); }
+  .side { flex: 0 0 340px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 12px 14px; max-height: 940px; overflow: auto; }
+  .side h2 { margin: 0 0 8px; font-size: 13px; letter-spacing: .08em; color: #e8d8a8;
+    font-weight: 600; text-transform: uppercase; }
+  .side h3 { margin: 14px 0 5px; font-size: 12px; color: #9fb0c4; font-weight: 600; }
+  .kv { display: grid; grid-template-columns: 96px 1fr; gap: 2px 8px; font-size: 12px; }
+  .kv .k { color: var(--dim); }
+  .warn { color: #ffb454; }
+  .ok { color: #5ee0a0; }
+  .bad { color: #ff6b6b; }
+  .grp { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--dim); }
+  .chk { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+  table { border-collapse: collapse; font-size: 11.5px; }
+  td { padding: 1px 6px 1px 0; }
+  td.hit { color: #5ee0a0; }
+  td.miss { color: #ff6b6b; font-weight: 600; }
+  .scale { font-size: 11px; color: var(--dim); }
+  .collide div { margin: 1px 0; font-size: 11.5px; color: #ffb454; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mapbox" id="mapbox">
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" width="1000" height="760"></svg>
+    <div id="tip"></div>
+  </div>
+
+  <aside class="side">
+    <h2>投影 / 数据诊断</h2>
+    <div class="kv" id="diag"></div>
+
+    <h3>图层</h3>
+    <div class="grp">
+      <label class="chk"><input type="checkbox" id="tLabels" checked> 省名标签</label>
+      <label class="chk"><input type="checkbox" id="tCenters"> center 十字</label>
+      <label class="chk"><input type="checkbox" id="tCities" checked> 城市点</label>
+      <label class="chk"><input type="checkbox" id="tGrid"> 100 网格</label>
+    </div>
+
+    <h3>标签碰撞（渲染实测）</h3>
+    <div class="collide" id="collide"></div>
+
+    <h3>城市测试点对位</h3>
+    <div id="cityTable"></div>
+
+    <h3>说明</h3>
+    <div class="scale">
+      URL 参数：<br>
+      <code>?view=full|main|scs</code> 选择 viewBox（main=bounds.mainland，
+      scs=bounds.scs）；<br>
+      <code>&amp;stage=856x598</code> 模拟主页舞台尺寸；<br>
+      <code>&amp;src=../tools/.cache/geo-miller.js</code> 换数据文件；<br>
+      <code>&amp;labels=0</code> 隐藏标签。
+    </div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var q = {};
+  location.search.replace(/[?&]([^=&]+)=([^&]*)/g, function (_, k, v) {
+    q[k] = decodeURIComponent(v); return _;
+  });
+  var SRC = q.src || "../data/china-geo.js";
+  var VIEW = q.view || "all";
+  var stage = q.stage ? q.stage.split(/[x×,]/).map(Number) : null;
+  var showLabels = q.labels !== "0";
+
+  var s = document.createElement("script");
+  s.src = SRC;
+  s.onload = function () { init(); };
+  s.onerror = function () {
+    document.getElementById("diag").innerHTML =
+      "<div class='bad'>加载失败：" + SRC + "</div>";
+  };
+  document.head.appendChild(s);
+
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  function init() {
+    var G = window.CHINA_GEO;
+    var svg = document.getElementById("map");
+    var tip = document.getElementById("tip");
+    var mapbox = document.getElementById("mapbox");
+
+    // ---- viewBox from URL -------------------------------------------------
+    var vb;
+    if (q.box) {
+      vb = q.box.split(",").map(Number);
+    } else if (VIEW === "main" && G.bounds && G.bounds.mainland) {
+      vb = G.bounds.mainland;
+    } else if (VIEW === "scs" && G.bounds && G.bounds.scs) {
+      vb = G.bounds.scs;
+    } else if (VIEW === "all" && G.bounds && G.bounds.mainland && G.bounds.scs) {
+      var A = G.bounds.mainland, B = G.bounds.scs;
+      vb = [Math.min(A[0], B[0]), Math.min(A[1], B[1]),
+            Math.max(A[2], B[2]), Math.max(A[3], B[3])];
+    } else if (VIEW === "full") {
+      vb = [0, 0, G.width, G.height];
+    } else {
+      vb = [0, 0, G.width, G.height];
+    }
+    var vw = vb[2] - vb[0], vh = vb[3] - vb[1];
+    // vb is [x0, y0, x1, y1]; SVG wants [x, y, width, height]
+    var vbAttr = [vb[0], vb[1], vw, vh];
+
+    if (stage) {
+      svg.setAttribute("width", stage[0]);
+      svg.setAttribute("height", stage[1]);
+      mapbox.style.width = stage[0] + "px";
+      mapbox.style.height = stage[1] + "px";
+    } else {
+      var sw = 1000, sh = Math.round(1000 * vh / vw);
+      if (VIEW === "main") { sw = 856; sh = Math.round(856 * vh / vw); }
+      svg.setAttribute("width", sw);
+      svg.setAttribute("height", sh);
+    }
+    svg.setAttribute("viewBox", vbAttr.join(" "));
+
+    var gGrid = el("g", { id: "grid", display: "none" }, svg);
+    var gLand = el("g", { id: "land" }, svg);
+    var gNine = el("g", { id: "nine" }, svg);
+    var gLabels = el("g", { id: "labels" }, svg);
+    var gCenters = el("g", { id: "centers", display: "none" }, svg);
+    var gCities = el("g", { id: "cities" }, svg);
+
+    var gridStep = vw > 400 ? 50 : 20;
+    for (var gx = Math.ceil(vb[0] / gridStep) * gridStep; gx <= vb[0] + vw; gx += gridStep) {
+      el("line", { x1: gx, y1: vb[1], x2: gx, y2: vb[1] + vh,
+        "class": "grid" + (gx % 100 === 0 ? " major" : "") }, gGrid);
+    }
+    for (var gy = Math.ceil(vb[1] / gridStep) * gridStep; gy <= vb[1] + vh; gy += gridStep) {
+      el("line", { x1: vb[0], y1: gy, x2: vb[0] + vw, y2: gy,
+        "class": "grid" + (gy % 100 === 0 ? " major" : "") }, gGrid);
+    }
+    el("rect", { x: vb[0] + .5, y: vb[1] + .5, width: vw - 1, height: vh - 1,
+      "class": "frame" }, svg);
+
+    // ---- provinces -------------------------------------------------------
+    var paths = {};
+    var bbox = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
+    G.provinces.forEach(function (p) {
+      var path = el("path", { d: p.path, "class": "prov", "data-short": p.short }, gLand);
+      paths[p.short] = path;
+      try {
+        var b = path.getBBox();
+        bbox.x0 = Math.min(bbox.x0, b.x); bbox.y0 = Math.min(bbox.y0, b.y);
+        bbox.x1 = Math.max(bbox.x1, b.x + b.width); bbox.y1 = Math.max(bbox.y1, b.y + b.height);
+      } catch (e) {}
+      path.addEventListener("mousemove", function (ev) { showTip(ev, p); });
+      path.addEventListener("mouseleave", hideTip);
+    });
+
+    // labels are appended after all paths so they sit on top
+    var labelEls = {};
+    G.provinces.forEach(function (p) {
+      if (!p.label) return;
+      var t = el("text", { x: p.label[0], y: p.label[1], "class": "lbl",
+        "data-short": p.short }, gLabels);
+      t.textContent = p.short;
+      labelEls[p.short] = t;
+      if (p.center) {
+        el("circle", { cx: p.center[0], cy: p.center[1], r: 1.6, "class": "center-dot" }, gCenters);
+        el("line", { x1: p.center[0] - 5, y1: p.center[1], x2: p.center[0] + 5, y2: p.center[1], "class": "center-cross" }, gCenters);
+        el("line", { x1: p.center[0], y1: p.center[1] - 5, x2: p.center[0], y2: p.center[1] + 5, "class": "center-cross" }, gCenters);
+      }
+    });
+
+    // ---- nine-dash (inset only in the app; hidden in the main-map view) ---
+    var segs = (G.nineDash && G.nineDash.segments) || [];
+    var showNine = q.nine === "1" || (q.nine !== "0" && VIEW !== "main");
+    gNine.setAttribute("display", showNine ? "inline" : "none");
+    segs.forEach(function (s2) {
+      el("line", { x1: s2[0], y1: s2[1], x2: s2[2], y2: s2[3], "class": "nine" }, gNine);
+    });
+
+    // ---- city test points -------------------------------------------------
+    var CITIES = [
+      ["北京", 116.407, 39.904, "北京"], ["天津", 117.201, 39.085, "天津"],
+      ["沈阳", 123.431, 41.805, "辽宁"], ["哈尔滨", 126.535, 45.803, "黑龙江"],
+      ["呼和浩特", 111.752, 40.842, "内蒙古"], ["西安", 108.940, 34.341, "陕西"],
+      ["延安", 109.490, 36.596, "陕西"], ["兰州", 103.834, 36.061, "甘肃"],
+      ["乌鲁木齐", 87.617, 43.793, "新疆"], ["拉萨", 91.132, 29.660, "西藏"],
+      ["成都", 104.066, 30.572, "四川"], ["重庆", 106.551, 29.563, "重庆"],
+      ["武汉", 114.305, 30.593, "湖北"], ["长沙", 112.939, 28.228, "湖南"],
+      ["广州", 113.264, 23.129, "广东"], ["香港", 114.173, 22.320, "香港"],
+      ["澳门", 113.5568, 22.1569, "澳门"], ["台北", 121.565, 25.033, "台湾"],
+      ["三亚", 109.512, 18.252, "海南"], ["瑞金", 116.027, 25.886, "江西"],
+      ["遵义", 106.927, 27.725, "贵州"], ["上海", 121.474, 31.230, "上海"],
+      ["南京", 118.797, 32.060, "江苏"], ["青岛", 120.383, 36.067, "山东"],
+      ["昆明", 102.833, 24.880, "云南"], ["南宁", 108.366, 22.817, "广西"],
+      ["海口", 110.199, 20.044, "海南"], ["西宁", 101.778, 36.617, "青海"],
+      ["银川", 106.231, 38.487, "宁夏"], ["合肥", 117.227, 31.821, "安徽"]
+    ];
+
+    function provinceAt(x, y) {
+      for (var i = 0; i < G.provinces.length; i++) {
+        var p = G.provinces[i], node = paths[p.short];
+        if (!node || !node.isPointInFill) continue;
+        try { if (node.isPointInFill(new DOMPoint(x, y))) return p.short; } catch (e) {}
+      }
+      return null;
+    }
+
+    var rows = [];
+    CITIES.forEach(function (c) {
+      var pt = G.project(c[1], c[2]), x = pt[0], y = pt[1];
+      var hit = provinceAt(x, y);
+      var ok = hit === c[3];
+      rows.push({ name: c[0], expect: c[3], hit: hit, ok: ok, x: x, y: y });
+      var g = el("g", null, gCities);
+      el("circle", { cx: x, cy: y, r: 5, "class": "city-ring" }, g);
+      el("circle", { cx: x, cy: y, r: 2.4, "class": "city-dot" }, g);
+      var t = el("text", { x: x + 6, y: y - 6, "class": "city-lbl" }, g);
+      if (!ok) t.setAttribute("style", "fill:#ff6b6b;font-weight:600");
+      t.textContent = c[0] + (ok ? "" : " ✗" + (hit || "空"));
+    });
+
+    // ---- label collisions (real rendered boxes) ---------------------------
+    var lblBoxes = [];
+    Object.keys(labelEls).forEach(function (k) {
+      var b = labelEls[k].getBBox();
+      lblBoxes.push({ short: k, x: b.x, y: b.y, w: b.width, h: b.height });
+    });
+    var hits = [];
+    for (var i = 0; i < lblBoxes.length; i++) {
+      for (var j = i + 1; j < lblBoxes.length; j++) {
+        var a = lblBoxes[i], b = lblBoxes[j];
+        var gap = 3;
+        if (!(a.x + a.w + gap <= b.x || b.x + b.w + gap <= a.x ||
+              a.y + a.h + gap <= b.y || b.y + b.h + gap <= a.y)) {
+          hits.push(a.short + " × " + b.short);
+        }
+      }
+    }
+    // labels outside the current viewBox
+    var outside = lblBoxes.filter(function (b) {
+      return b.x < vb[0] || b.y < vb[1] || b.x + b.w > vb[0] + vw || b.y + b.h > vb[1] + vh;
+    }).map(function (b) { return b.short; });
+
+    // ---- diagnostics ------------------------------------------------------
+    var diag = document.getElementById("diag");
+    function kv(k, v, cls) {
+      var d = document.createElement("div"); d.className = "k"; d.textContent = k;
+      var e = document.createElement("div"); if (cls) e.className = cls; e.textContent = v;
+      diag.appendChild(d); diag.appendChild(e);
+    }
+    var bad = rows.filter(function (r) { return !r.ok; });
+    var mb = (G.bounds && G.bounds.mainland) || [0, 0, 0, 0];
+    var sb = (G.bounds && G.bounds.scs) || [0, 0, 0, 0];
+    kv("数据文件", SRC.split("/").pop());
+    kv("viewBox", VIEW + " → " + vb.map(function (n) { return Math.round(n * 10) / 10; }).join(", "));
+    kv("画布", G.width + " × " + G.height);
+    kv("省数", G.provinces.length + " 个");
+    kv("大陆 bbox", mb.map(function (n) { return Math.round(n); }).join(", ") +
+       "  (" + Math.round(mb[2] - mb[0]) + "×" + Math.round(mb[3] - mb[1]) +
+       ", 比例 " + ((mb[2] - mb[0]) / (mb[3] - mb[1])).toFixed(2) + ")");
+    kv("十段线 bbox", sb.map(function (n) { return Math.round(n); }).join(", "));
+    kv("十段线", segs.length + " 段", segs.length === 10 ? "ok" : "warn");
+    kv("省界 bbox", Math.round(bbox.x0) + "," + Math.round(bbox.y0) + " → " +
+       Math.round(bbox.x1) + "," + Math.round(bbox.y1));
+    kv("标签碰撞", hits.length ? hits.join("；") : "无", hits.length ? "bad" : "ok");
+    kv("标签出框", outside.length ? outside.join("、") : "无", outside.length ? "warn" : "ok");
+    kv("城市对位", (rows.length - bad.length) + " / " + rows.length, bad.length ? "bad" : "ok");
+    if (bad.length) {
+      kv("错位", bad.map(function (r) {
+        return r.name + "→" + (r.hit || "空") + "(期望" + r.expect + ")";
+      }).join("；"), "bad");
+    }
+    var coll = document.getElementById("collide");
+    if (!hits.length) {
+      coll.innerHTML = "<div class='ok'>无重叠</div>";
+    } else {
+      coll.innerHTML = hits.map(function (h) { return "<div>" + h + "</div>"; }).join("");
+    }
+
+    // machine-readable dump for CLI checks: ?dump=1 then read with --dump-dom
+    var dump = document.createElement("pre");
+    dump.id = "dump";
+    dump.style.display = "none";
+    dump.textContent = JSON.stringify({
+      src: SRC, view: VIEW, viewBox: vb,
+      bounds: G.bounds, labelBoxes: lblBoxes, collisions: hits, outside: outside
+    });
+    document.body.appendChild(dump);
+
+    var tbl = document.getElementById("cityTable");
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr");
+      var a = document.createElement("td"); a.textContent = r.name;
+      var b = document.createElement("td"); b.textContent = r.hit || "（空）";
+      b.className = r.ok ? "hit" : "miss";
+      var c = document.createElement("td");
+      c.textContent = r.ok ? "✓ " + Math.round(r.x) + "," + Math.round(r.y)
+                           : "✗ 期望 " + r.expect;
+      c.style.color = r.ok ? "#7d8b9c" : "#ff6b6b";
+      tr.appendChild(a); tr.appendChild(b); tr.appendChild(c);
+      tbl.appendChild(tr);
+    });
+
+    // ---- tooltip ----------------------------------------------------------
+    function showTip(ev, p) {
+      var host = mapbox.getBoundingClientRect();
+      var x = ev.clientX - host.left, y = ev.clientY - host.top;
+      tip.innerHTML = "<b>" + p.short + "</b> <span class='k'>" + p.name + "</span><br>" +
+        "<span class='k'>id</span> " + p.id + " &nbsp; <span class='k'>area</span> " + p.area +
+        "<br><span class='k'>center</span> " + p.center.join(", ") +
+        "<br><span class='k'>label</span> " + (p.label || []).join(", ");
+      tip.style.display = "block";
+      tip.style.left = Math.max(4, Math.min(x + 14, host.width - tip.offsetWidth - 8)) + "px";
+      tip.style.top = Math.max(4, y + 14) + "px";
+    }
+    function hideTip() { tip.style.display = "none"; }
+
+    // ---- toggles ----------------------------------------------------------
+    function bind(id, group, on) {
+      var box = document.getElementById(id);
+      box.checked = on;
+      group.setAttribute("display", on ? "inline" : "none");
+      box.addEventListener("change", function () {
+        group.setAttribute("display", this.checked ? "inline" : "none");
+      });
+    }
+    bind("tLabels", gLabels, showLabels);
+    bind("tCenters", gCenters, false);
+    bind("tCities", gCities, q.cities !== "0");
+    bind("tGrid", gGrid, q.grid === "1");
+  }
+})();
+</script>
+</body>
+</html>

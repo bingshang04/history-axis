@@ -1,0 +1,17 @@
+node_modules/
+tools/.cache/
+*.log
+
+# 开发过程材料，不进入公开仓库
+reviews/
+experiments/
+docs/superpowers/
+
+# 只保留 README 中引用的最终截图
+screenshots/*
+!screenshots/app-second-opium.png
+!screenshots/app-mao.png
+!screenshots/app-1937.png
+!screenshots/app-all.png
+!screenshots/app-1440.png
+!screenshots/timeline-relations-1894.png

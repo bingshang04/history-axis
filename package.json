@@ -1,0 +1,16 @@
+{
+  "name": "history-axis",
+  "version": "1.0.0",
+  "private": true,
+  "description": "史纲·毛中特 时间轴 —— 近现代史纲要 × 毛中特 考点可视化",
+  "main": "index.html",
+  "scripts": {
+    "verify": "node tools/verify_data.js",
+    "shot": "node tools/shot.js"
+  },
+  "keywords": ["history", "timeline", "china", "education", "visualization"],
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  }
+}
