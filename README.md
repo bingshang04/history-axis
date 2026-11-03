@@ -3,6 +3,8 @@
 > 中国近现代史纲要 × 毛泽东思想和中国特色社会主义理论体系概论
 > 交互式「地图 + 时间轴 + 考研考点卡 + 理论演进图谱」复习工作台
 
+**在线预览：** https://bingshang04.github.io/history-axis/
+
 一个零依赖、可离线运行的暗色学术工作台：拖动年份，地图按时期势力重着色，左侧同步给出教材章节考点，右侧给出事件定位与势力图；毛中特模式切换为五条理论主线的演进图谱。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-c9a45c.svg)](LICENSE)
