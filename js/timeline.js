@@ -40,6 +40,7 @@
     this.posEl = $("tlPos");
     this.noteEl = $("tlNote");
     this.linkSvg = $("tlLinks");
+    this.scrollEl = $("tlScroll");
     this.initLinkMarkers();
     this.canvas.addEventListener("pointerdown", function (e) { self.onPointerDown(e); });
     this.canvas.addEventListener("pointermove", function (e) { self.onPointerMove(e); });
@@ -115,7 +116,25 @@
   };
 
   timeline.updateNote = function () {
-    if (this.noteEl) this.noteEl.textContent = this.start + " — " + this.end + " · 拖拽扫年 · 共 " + this.items.length + " 个节点";
+    if (!this.noteEl) return;
+    var scrollable = this.scrollEl && this.scrollEl.scrollWidth > this.scrollEl.clientWidth + 4;
+    this.noteEl.textContent = this.start + " — " + this.end +
+      (scrollable ? " · 左右滑动 · 点节点" : " · 拖拽扫年 · 共 " + this.items.length + " 个节点");
+  };
+
+  timeline.isScrollable = function () {
+    return !!(this.scrollEl && this.scrollEl.scrollWidth > this.scrollEl.clientWidth + 4);
+  };
+
+  timeline.followPlayhead = function () {
+    if (!this.scrollEl || !this.isScrollable()) return;
+    var x = this.x(this.year);
+    var left = this.scrollEl.scrollLeft;
+    var w = this.scrollEl.clientWidth;
+    if (x < left + 18 || x > left + w - 18) {
+      var max = Math.max(0, this.scrollEl.scrollWidth - w);
+      this.scrollEl.scrollLeft = U.clamp(x - w * 0.45, 0, max);
+    }
   };
 
   timeline.renderBands = function () {
@@ -272,7 +291,7 @@
   timeline.renderLabels = function () {
     var self = this;
     // rank 优先，其次按年份；最多三行，避免拥挤。窄屏只显示 rank1 标签
-    var narrow = this.innerW < 1000;
+    var narrow = this.innerW < 1200;
     var candidates = this.items.filter(function (it) {
       return it.rank === 1 || (!narrow && it.rank === 2);
     });
@@ -343,6 +362,7 @@
       this.dotEls[uid].classList.toggle("past", it.year <= year + 1e-6);
       this.dotEls[uid].classList.remove("future");
     }
+    this.followPlayhead();
     void force;
   };
 
@@ -429,6 +449,8 @@
 
   timeline.onPointerDown = function (e) {
     if (e.button !== 0) return;
+    // 手机端时间轴是可横向滚动的画布：把滑动留给浏览器，点击节点仍可选中。
+    if (this.isScrollable()) return;
     this._dragging = true;
     this.scrubTo(e.clientX);
     if (Axis.player) Axis.player.pause();

@@ -552,6 +552,10 @@
     void el.offsetWidth;
     el.classList.add("pulse");
     setTimeout(function () { el.classList.remove("pulse"); }, 900);
+    if (window.matchMedia && window.matchMedia("(max-width: 719px), (max-width: 900px) and (max-height: 500px)").matches) {
+      var tl = U.$("#timeline");
+      if (tl) tl.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
     U.toast("已定位到 " + U.fmtYear(this.state.year) + " 年");
   };
 

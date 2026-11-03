@@ -367,8 +367,72 @@
     });
     this.root.appendChild(axisLayer);
 
+    // 窄屏纵向节点列表（与 SVG 图谱二选一显示）
+    this.renderMobile();
+
     // 重新挂选中态
     if (this.selected) this.applySelection();
+  };
+
+  theory.renderMobile = function () {
+    var box = U.$("#theoryMobile");
+    if (!box) return;
+    var D = Axis.data;
+    var U2 = U;
+    box.textContent = "";
+    D.theories.forEach(function (th) {
+      var nodes = D.maoNodes.filter(function (n) { return n.theory === th.id; });
+      if (!nodes.length) return;
+      nodes.sort(function (a, b) { return a.year - b.year; });
+      var lane = document.createElement("div");
+      lane.className = "tm-lane";
+      lane.style.setProperty("--tm-color", th.color);
+      var head = document.createElement("div");
+      head.className = "tm-head";
+      head.appendChild(document.createTextNode(th.name));
+      if (th.status) {
+        var em = document.createElement("em");
+        em.textContent = th.status;
+        head.appendChild(em);
+      }
+      lane.appendChild(head);
+      nodes.forEach(function (n) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "tm-node";
+        b.setAttribute("data-uid", "m:" + n.id);
+        var y = document.createElement("span");
+        y.className = "tm-year";
+        y.textContent = U2.fmtYear(n.year);
+        var t = document.createElement("span");
+        t.className = "tm-title";
+        t.textContent = n.short || n.title;
+        b.appendChild(y);
+        b.appendChild(t);
+        b.addEventListener("click", function () {
+          Axis.app.selectUid("m:" + n.id, { fromGraph: true });
+        });
+        lane.appendChild(b);
+      });
+      box.appendChild(lane);
+    });
+  };
+
+  theory.syncMobileSelection = function () {
+    var box = U.$("#theoryMobile");
+    if (!box || box.offsetParent === null) return;
+    var active = null;
+    U.$$("#theoryMobile .tm-node").forEach(function (el) {
+      var on = el.getAttribute("data-uid") === this.selected;
+      el.classList.toggle("active", on);
+      if (on) active = el;
+    }, this);
+    if (!active) return;
+    var max = Math.max(0, box.scrollHeight - box.clientHeight);
+    var boxRect = box.getBoundingClientRect();
+    var actRect = active.getBoundingClientRect();
+    var top = actRect.top - boxRect.top + box.scrollTop - box.clientHeight * 0.5 + actRect.height * 0.5;
+    box.scrollTop = U.clamp(top, 0, max);
   };
 
   theory.endpointPos = function (id, side) {
@@ -404,6 +468,22 @@
       e.el.setAttribute("stroke-width", connected ? "1.8" : "1");
       e.el.setAttribute("opacity", id ? (connected ? "1" : ".35") : "1");
     });
+    this.focusSelected();
+    this.syncMobileSelection();
+  };
+
+  theory.focusSelected = function () {
+    var area = document.querySelector(".theory-area");
+    if (!area || !this.selected || area.offsetParent === null) return;
+    if (area.scrollWidth <= area.clientWidth + 4) return;
+    var id = this.selected.indexOf("m:") === 0 ? this.selected.slice(2) : null;
+    var pos = id && this.nodePos[id];
+    if (!pos) return;
+    var maxL = area.scrollWidth - area.clientWidth;
+    var maxT = area.scrollHeight - area.clientHeight;
+    var left = U.clamp(pos.x / 1000 * area.scrollWidth - area.clientWidth * 0.5, 0, maxL);
+    var top = U.clamp(pos.y / 600 * area.scrollHeight - area.clientHeight * 0.45, 0, maxT);
+    area.scrollTo({ left: left, top: top, behavior: "smooth" });
   };
 
   theory.setSelection = function (uid) {

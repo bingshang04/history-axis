@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070a0f">
 <title>史纲 · 毛中特 时间轴 | 近现代史考点可视化</title>
 <meta name="description" content="中国近现代史纲要 × 毛泽东思想和中国特色社会主义理论体系概论 · 交互式时间轴与地图考点复习">
 <link rel="icon" href="data:,">
@@ -150,6 +151,7 @@
 
       <div class="theory-area" id="theoryArea" hidden>
         <svg id="theorySvg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="马克思主义中国化时代化理论演进图谱"></svg>
+        <div class="theory-mobile" id="theoryMobile" aria-label="理论节点纵向列表"></div>
         <div class="theory-tip" id="theoryTip" hidden></div>
       </div>
     </section>
@@ -197,16 +199,18 @@
         <span class="tl-title">时间轴</span>
         <span class="tl-note" id="tlNote">1840 — 2025 · 拖拽扫年</span>
       </div>
-      <div class="tl-canvas" id="tlCanvas">
-        <div class="tl-bands" id="tlBands"></div>
-        <svg class="tl-links" id="tlLinks" aria-hidden="true"></svg>
-        <div class="tl-labels" id="tlLabels"></div>
-        <div class="tl-rail" id="tlRail"></div>
-        <div class="tl-dots" id="tlDots"></div>
-        <div class="tl-ruler" id="tlRuler"></div>
-        <div class="tl-playhead" id="tlPlayhead">
-          <div class="tl-playhead-year" id="tlPlayheadYear">1840</div>
-          <div class="tl-playhead-diamond"></div>
+      <div class="tl-scroll" id="tlScroll">
+        <div class="tl-canvas" id="tlCanvas">
+          <div class="tl-bands" id="tlBands"></div>
+          <svg class="tl-links" id="tlLinks" aria-hidden="true"></svg>
+          <div class="tl-labels" id="tlLabels"></div>
+          <div class="tl-rail" id="tlRail"></div>
+          <div class="tl-dots" id="tlDots"></div>
+          <div class="tl-ruler" id="tlRuler"></div>
+          <div class="tl-playhead" id="tlPlayhead">
+            <div class="tl-playhead-year" id="tlPlayheadYear">1840</div>
+            <div class="tl-playhead-diamond"></div>
+          </div>
         </div>
       </div>
       <div class="tl-foot">
