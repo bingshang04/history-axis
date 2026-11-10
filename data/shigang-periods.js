@@ -65,13 +65,13 @@ window.SHIGANG_PERIODS = {
     {
       id: "p5", from: 1895, to: 1899, era: "清 · 瓜分危机",
       boundaryNote: "清 · 1911年疆界（示意）",
-      summary: "《马关条约》割台湾；列强强租港湾、划分势力范围。",
+      summary: "《马关条约》割台湾；列强强租港湾、划分势力范围。台湾按一个中国原则统一着色。",
       defaultForce: "qing",
       overrides: {
         "香港": "british", "辽宁": "russia",
         "山东": "germany", "广东": "france"
       },
-      legend: ["qing", "japan", "russia", "germany", "france", "british"]
+      legend: ["qing", "russia", "germany", "france", "british"]
     },
     {
       id: "p6", from: 1899, to: 1911, era: "清 · 清末新政",
@@ -91,7 +91,7 @@ window.SHIGANG_PERIODS = {
       summary: "辛亥革命推翻清王朝，中华民国成立；袁世凯窃取革命果实。",
       defaultForce: "republic",
       overrides: { "香港": "british", "澳门": "portugal" },
-      legend: ["republic", "japan", "british", "portugal"]
+      legend: ["republic", "british", "portugal"]
     },
     {
       id: "p8", from: 1916, to: 1928, era: "民国 · 军阀割据",
@@ -106,7 +106,7 @@ window.SHIGANG_PERIODS = {
         "广东": "republic", "四川": "sichuan", "山西": "shanxi",
         "香港": "british", "澳门": "portugal"
       },
-      legend: ["republic", "beiyang", "wan", "feng", "yunnan", "guangxi", "sichuan", "shanxi", "japan", "british", "portugal"]
+      legend: ["republic", "beiyang", "wan", "feng", "yunnan", "guangxi", "sichuan", "shanxi", "british", "portugal"]
     },
     {
       id: "p9", from: 1928, to: 1931, era: "民国 · 南京国民政府",
@@ -114,7 +114,7 @@ window.SHIGANG_PERIODS = {
       summary: "南京国民政府形式统一全国；农村革命根据地开始创建。",
       defaultForce: "npc",
       overrides: { "香港": "british", "澳门": "portugal" },
-      legend: ["npc", "japan", "british", "portugal"]
+      legend: ["npc", "british", "portugal"]
     },
     {
       id: "p10", from: 1931, to: 1937, era: "民国 · 民族危机加深",
@@ -126,7 +126,7 @@ window.SHIGANG_PERIODS = {
         "江西": "ccp", "福建": "ccp",
         "香港": "british", "澳门": "portugal"
       },
-      legend: ["npc", "manchukuo", "ccp", "japan", "british", "portugal"]
+      legend: ["npc", "manchukuo", "ccp", "british", "portugal"]
     },
     {
       id: "p11", from: 1937, to: 1945, era: "民国 · 全面抗战",

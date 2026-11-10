@@ -43,17 +43,23 @@
     this.relLayer = document.createElementNS(NS, "g");
     this.relLayer.setAttribute("id", "relationsLayer");
     this.root.insertBefore(this.relLayer, this.pinLayer);
+    this.dynamicsLayer = document.createElementNS(NS, "g");
+    this.dynamicsLayer.setAttribute("id", "dynamicsLayer");
+    this.root.insertBefore(this.dynamicsLayer, this.relLayer);
     if (!this.geo || !this.geo.provinces) {
       this.geo = null;
       return;
     }
     this.setViewBox();
     this.initRelationMarkers();
+    this.initDynamicsMarkers();
     this.renderProvinces();
     this.renderMicroMarkers();
     this.renderLabels();
     this.renderPinItems();
     this.renderInsets();
+    this.dynamicsOn = true;
+    this.renderDynamics(this.year);
     this.bind();
   };
 
@@ -83,6 +89,24 @@
       marker.appendChild(path);
       defs.appendChild(marker);
     });
+  };
+
+  map.initDynamicsMarkers = function () {
+    var defs = this.svg.querySelector("defs");
+    if (!defs) return;
+    var marker = document.createElementNS(NS, "marker");
+    marker.setAttribute("id", "dyn-arrow");
+    marker.setAttribute("viewBox", "0 0 10 10");
+    marker.setAttribute("refX", "8");
+    marker.setAttribute("refY", "5");
+    marker.setAttribute("markerWidth", "6");
+    marker.setAttribute("markerHeight", "6");
+    marker.setAttribute("orient", "auto-start-reverse");
+    var path = document.createElementNS(NS, "path");
+    path.setAttribute("d", "M0 0 L10 5 L0 10 z");
+    path.setAttribute("fill", "#c9a45c");
+    marker.appendChild(path);
+    defs.appendChild(marker);
   };
 
   map.setViewBox = function () {
@@ -347,6 +371,13 @@
         else self.zoomAt(self.vbCenter(), self.z / 1.32);
       });
     });
+
+    var dynBtn = U.$("#mapLayerBtn");
+    if (dynBtn) {
+      dynBtn.classList.toggle("off", !this.dynamicsOn);
+      dynBtn.setAttribute("aria-pressed", this.dynamicsOn ? "true" : "false");
+      dynBtn.addEventListener("click", function () { self.setDynamics(!self.dynamicsOn); });
+    }
   };
 
   map.vbCenter = function () {
@@ -411,6 +442,7 @@
       this.renderRelations(this.selectedUid);
       this.scheduleOverlay();
     }
+    this.renderDynamics(this.year);
   };
 
   map.setPeriod = function (period, forceOn) {
@@ -431,6 +463,7 @@
       this.microMap[ms].setAttribute("data-force", mkey);
     }
     this.applyForceFilter();
+    this.renderDynamics(this.year);
   };
 
   map.setYear = function (year) {
@@ -445,6 +478,7 @@
       g.classList.toggle("future", it.year > year + 0.55);
       g.classList.toggle("past", it.year <= year + 0.55);
     }
+    this.renderDynamics(year);
   };
 
   map.setSelection = function (uid) {
@@ -503,6 +537,94 @@
       label.textContent = (r.dir === "in" ? "← " : "") + r.label;
       self.relLayer.appendChild(label);
     });
+  };
+
+  map.setDynamics = function (on) {
+    this.dynamicsOn = !!on;
+    var btn = U.$("#mapLayerBtn");
+    if (btn) {
+      btn.classList.toggle("off", !this.dynamicsOn);
+      btn.setAttribute("aria-pressed", this.dynamicsOn ? "true" : "false");
+      btn.title = this.dynamicsOn ? "隐藏行军路线与根据地" : "显示行军路线与根据地";
+    }
+    this.renderDynamics(this.year);
+  };
+
+  map.renderDynamics = function (year) {
+    var keyEl = U.$("#mapDynKey");
+    function setKey(nR, nB, show) {
+      if (!keyEl) return;
+      keyEl.hidden = !(show && (nR + nB));
+      if (show && (nR + nB)) {
+        keyEl.innerHTML = '<span class="mdk-route"><i></i>路线 ' + nR + ' 条</span>' +
+          '<span class="mdk-base"><i></i>根据地 ' + nB + ' 处</span>';
+      }
+    }
+    if (!this.dynamicsLayer) { setKey(0, 0, false); return; }
+    this.dynamicsLayer.textContent = "";
+    var on = this.dynamicsOn !== false && this.tab !== "mao";
+    this.dynamicsLayer.style.display = on ? "" : "none";
+    if (!on || !window.AXIS_DYNAMICS || !this.geo || typeof this.geo.project !== "function") { setKey(0, 0, false); return; }
+
+    var self = this;
+    var dyn = window.AXIS_DYNAMICS;
+    var y = isFinite(year) ? year : this.year;
+    var nRoutes = 0, nBases = 0;
+
+    (dyn.bases || []).forEach(function (b) {
+      if (y < b.from - 0.3 || y > b.to + 0.3) return;
+      var p = self.geo.project(b.lonlat[0], b.lonlat[1]);
+      if (!p) return;
+      var circle = document.createElementNS(NS, "circle");
+      circle.setAttribute("class", "dynamics-base");
+      circle.setAttribute("cx", p[0].toFixed(1));
+      circle.setAttribute("cy", p[1].toFixed(1));
+      circle.setAttribute("r", String(b.r || 16));
+      circle.setAttribute("data-base", b.id);
+      self.dynamicsLayer.appendChild(circle);
+      var label = document.createElementNS(NS, "text");
+      label.setAttribute("class", "dynamics-base-label");
+      label.setAttribute("x", p[0].toFixed(1));
+      label.setAttribute("y", (p[1] - (b.r || 16) - 3).toFixed(1));
+      label.setAttribute("text-anchor", "middle");
+      label.textContent = b.name;
+      self.dynamicsLayer.appendChild(label);
+      nBases++;
+    });
+
+    (dyn.routes || []).forEach(function (r) {
+      if (y < r.from - 0.15 || y > r.to + 0.45) return;
+      var pts = (r.points || []).map(function (ll) { return self.geo.project(ll[0], ll[1]); }).filter(Boolean);
+      if (pts.length < 2) return;
+      var d = "M" + pts[0][0].toFixed(1) + "," + pts[0][1].toFixed(1);
+      for (var i = 1; i < pts.length; i++) {
+        d += " L" + pts[i][0].toFixed(1) + "," + pts[i][1].toFixed(1);
+      }
+      var halo = document.createElementNS(NS, "path");
+      halo.setAttribute("class", "dynamics-route-halo");
+      halo.setAttribute("d", d);
+      self.dynamicsLayer.appendChild(halo);
+      var path = document.createElementNS(NS, "path");
+      path.setAttribute("class", "dynamics-route");
+      path.setAttribute("d", d);
+      path.setAttribute("stroke", r.color || "#c9a45c");
+      path.setAttribute("marker-end", "url(#dyn-arrow)");
+      path.setAttribute("data-route", r.id);
+      self.dynamicsLayer.appendChild(path);
+
+      var mid = pts[Math.max(1, pts.length - 2)];
+      var label = document.createElementNS(NS, "text");
+      label.setAttribute("class", "dynamics-route-label");
+      label.setAttribute("x", mid[0].toFixed(1));
+      label.setAttribute("y", (mid[1] - 5).toFixed(1));
+      label.setAttribute("text-anchor", "middle");
+      label.setAttribute("fill", r.color || "#c9a45c");
+      label.textContent = r.name;
+      self.dynamicsLayer.appendChild(label);
+      nRoutes++;
+    });
+
+    setKey(nRoutes, nBases, true);
   };
 
   map.pickPin = function (clientX, clientY) {

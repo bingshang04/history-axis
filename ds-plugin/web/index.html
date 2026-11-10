@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +7,7 @@
 <title>史纲 · 毛中特 时间轴 | 近现代史考点可视化</title>
 <meta name="description" content="中国近现代史纲要 × 毛泽东思想和中国特色社会主义理论体系概论 · 交互式时间轴与地图考点复习">
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/app.css?v=3">
+<link rel="stylesheet" href="css/app.css?v=5">
 </head>
 <body>
 <div class="app" id="app">
@@ -16,7 +16,7 @@
     <div class="brand">
       <div class="brand-year" id="bigYear">1840</div>
       <div class="brand-text">
-        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.0</span></div>
+        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.1</span></div>
         <div class="brand-sub" id="brandSub">上编 · 旧民主主义革命时期</div>
         <div class="brand-meta">近现代史纲要 × 毛中特 · 考点可视化复习</div>
       </div>
@@ -60,6 +60,10 @@
           <button data-year="1978">1978</button>
           <button data-year="2012">2012</button>
         </div>
+        <button class="stage-open-btn" id="stageBtn" title="阶段图表（快捷键 G）" aria-expanded="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13V8.5M6.5 13V4M10.5 13V10M14 13V6"/></svg>
+          <span>阶段图表</span>
+        </button>
         <button class="search-btn" id="searchBtn" title="搜索考点（快捷键 /）">
           <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor"/><path d="M10.4 10.4 14 14" stroke="currentColor"/></svg>
           <span>搜索</span>
@@ -141,6 +145,15 @@
         <div class="map-tip" id="mapTip" hidden></div>
 
         <div class="period-tip" id="periodTip"></div>
+
+        <button class="map-layer-btn" id="mapLayerBtn" type="button" aria-pressed="true" title="显示 / 隐藏行军路线与根据地">
+          <span class="ml-dot"></span>动态层
+        </button>
+
+        <div class="map-dyn-key" id="mapDynKey" hidden>
+          <span class="mdk-route"><i></i>路线</span>
+          <span class="mdk-base"><i></i>根据地</span>
+        </div>
 
         <div class="map-zoom" id="mapZoom" aria-label="地图缩放">
           <button data-zoom="in" title="放大">＋</button>
@@ -242,20 +255,47 @@
   </div>
 </div>
 
+<div class="stage-overlay" id="stageOverlay" hidden>
+  <div class="stage-modal" role="dialog" aria-modal="true" aria-labelledby="stageModalTitle">
+    <header class="stage-modal-head">
+      <div class="stage-modal-title-wrap">
+        <div class="stage-modal-kicker">阶段图表 · 考研复习</div>
+        <h2 id="stageModalTitle">五个阶段，一条主线</h2>
+        <p>先看力量格局，再顺事件链，最后用重点与易混点收口。</p>
+      </div>
+      <div class="stage-modal-head-right">
+        <span class="stage-key-hint">G 打开 · ←/→ 切换</span>
+        <button class="stage-close" id="stageClose" title="关闭（Esc）">关闭</button>
+      </div>
+    </header>
+    <div class="stage-modal-body">
+      <nav class="stage-nav" id="stageNav" aria-label="复习阶段"></nav>
+      <div class="stage-main" id="stageMain"></div>
+    </div>
+    <footer class="stage-modal-foot">
+      <span>口径：2023 版《中国近现代史纲要》《毛中特》 · 徐涛强化班复盘笔记</span>
+      <span>阶段图表用于建立框架，具体表述以教材为准</span>
+    </footer>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
-<script src="data/china-geo.js?v=3"></script>
-<script src="data/shigang-periods.js?v=3"></script>
-<script src="data/shigang-events.js?v=3"></script>
-<script src="data/mao-data.js?v=3"></script>
-<script src="js/util.js?v=3"></script>
-<script src="js/data.js?v=3"></script>
-<script src="js/map.js?v=3"></script>
-<script src="js/theory.js?v=3"></script>
-<script src="js/timeline.js?v=3"></script>
-<script src="js/panels.js?v=3"></script>
-<script src="js/player.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="data/china-geo.js?v=5"></script>
+<script src="data/shigang-periods.js?v=5"></script>
+<script src="data/shigang-events.js?v=5"></script>
+<script src="data/mao-data.js?v=5"></script>
+<script src="data/stages.js?v=5"></script>
+<script src="data/dynamics.js?v=5"></script>
+<script src="js/util.js?v=5"></script>
+<script src="js/data.js?v=5"></script>
+<script src="js/map.js?v=5"></script>
+<script src="js/theory.js?v=5"></script>
+<script src="js/timeline.js?v=5"></script>
+<script src="js/panels.js?v=5"></script>
+<script src="js/player.js?v=5"></script>
+<script src="js/stages.js?v=5"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>
 

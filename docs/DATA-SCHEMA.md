@@ -258,3 +258,56 @@ window.MAO_DATA = {
 - 考研口径：优先使用教材/大纲原表述，避免网络段子与戏说。
 - 文案紧凑：左卡在 1855×~720 的可视区域内不出现大面积滚动（默认只显示所选事件的完整卡片，允许滚动）。
 - 中文标点：全角标点；书名号《》；引号“”。
+
+## 7. 阶段图表与动态层
+
+### `window.STAGES`
+
+```js
+window.STAGES = {
+  meta: { version: "1.0", source: "2023 版教材 · 徐涛强化班复盘笔记" },
+  stages: [
+    {
+      id: "s1", roman: "Ⅰ", from: 1840, to: 1919,
+      kicker: "上编 · 旧民主主义革命",
+      title: "旧民主主义革命",
+      tagline: "两半社会逐步形成，各阶级探索均未完成救亡",
+      years: "1840 — 1919", color: "#c9a45c",
+      scene: "半殖民地半封建社会逐步形成",
+      contradictions: ["帝国主义与中华民族的矛盾（最主要）"],
+      task: "反帝反封建：争取民族独立、人民解放",
+      thesis: "…",
+      forceYears: [1840, 1856, 1895, 1911],
+      mapYear: 1911,
+      events: ["opium-war", "taiping"],
+      theories: [],
+      points: [{ k: "…", v: "…" }],
+      pitfalls: [["错误说法", "正确辨析"]],
+      checklist: ["…"]
+    }
+  ]
+};
+```
+
+- `events` 必须引用 `window.SHIGANG_EVENTS` 中存在的 id；`theories` 引用 `MAO_DATA` 的 id。
+- `forceYears` 用于阶段内“省域着色计数”力量条；`mapYear` 用于阶段“看地图”跳转。
+- 可选 `economy`（S3 的五种经济成分）字段为 `[{name, note}]`。
+
+### `window.AXIS_DYNAMICS`
+
+```js
+window.AXIS_DYNAMICS = {
+  routes: [
+    { id: "long-march", name: "红军长征", from: axisYear(1934, 8), to: axisYear(1936, 10),
+      color: "#b05846", points: [[lon, lat], …], note: "瑞金 → 遵义 → 吴起" }
+  ],
+  bases: [
+    { id: "jinggangshan", name: "井冈山", from: axisYear(1927, 10), to: axisYear(1930, 2),
+      lonlat: [lon, lat], r: 24, note: "…" }
+  ]
+};
+```
+
+- 所有时间用 `axisYear(year, month) = year + (month-1)/12`，禁止直接写 `1948.11` 这类小数（会被解析为 1948.11 ≈ 1948.1）。
+- `routes.points` 为经纬度，渲染时经 `CHINA_GEO.project` 转为 SVG 坐标；`bases.lonlat` 同理。
+- 路线显隐：`year ∈ [from - 0.15, to + 0.45]`；根据地保留前后 ±0.3 年。

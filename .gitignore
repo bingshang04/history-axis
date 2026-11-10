@@ -16,4 +16,6 @@ screenshots/*
 !screenshots/app-1440.png
 !screenshots/app-mobile.png
 !screenshots/app-tablet.png
+!screenshots/app-stage-atlas.png
+!screenshots/app-map-dynamics.png
 !screenshots/timeline-relations-1894.png

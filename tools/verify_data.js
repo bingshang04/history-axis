@@ -206,6 +206,54 @@ if (mao) {
   console.log(`毛中特：${nodes.length} 节点 / ${topics.length} 专题 / ${(mao.edges || []).length} 关系`);
 }
 
+/* ---------- stage atlas ---------- */
+const stages = loadGlobal("stages.js", "STAGES");
+if (stages) {
+  const list = stages.stages || [];
+  if (list.length !== 5) fail(`STAGES.stages 应为 5 个，实际 ${list.length}`);
+  const eventIds = new Set((events || []).map(e => e.id));
+  const theoryIds = new Set(((mao && mao.theories) || []).map(t => t.id));
+  let expect = list.length ? list[0].from : 0;
+  for (const s of list) {
+    if (!s.id || !s.title) fail("阶段缺少 id/title");
+    if (s.from !== expect) fail(`阶段不连续：${s.id} 从 ${s.from} 开始，应为 ${expect}`);
+    if (!(s.to > s.from)) fail(`阶段区间非法：${s.id}`);
+    if (s.from < 1840 || s.to > 2026) fail(`阶段 ${s.id} 越界`);
+    if (!s.scene || !s.task || !Array.isArray(s.contradictions) || !s.contradictions.length) fail(`阶段 ${s.id} 缺国情/矛盾/任务`);
+    if (!Array.isArray(s.points) || s.points.length < 3) fail(`阶段 ${s.id} 重点不足`);
+    if (!Array.isArray(s.pitfalls) || s.pitfalls.length < 2) fail(`阶段 ${s.id} 易混不足`);
+    if (!Array.isArray(s.checklist) || s.checklist.length < 3) fail(`阶段 ${s.id} 清单不足`);
+    if (!Array.isArray(s.forceYears) || !s.forceYears.length) fail(`阶段 ${s.id} 缺 forceYears`);
+    if (!Array.isArray(s.events) || !s.events.length) fail(`阶段 ${s.id} 缺事件链`);
+    for (const id of s.events || []) if (!eventIds.has(id)) fail(`阶段 ${s.id} 引用不存在事件：${id}`);
+    for (const id of s.theories || []) if (!theoryIds.has(id)) fail(`阶段 ${s.id} 引用不存在理论：${id}`);
+    for (const y of s.forceYears || []) if (y < s.from || y > s.to + 1) warn(`阶段 ${s.id} forceYear ${y} 超出区间`);
+    expect = s.to;
+  }
+  console.log(`阶段图表：${list.length} 个阶段 / ${list.reduce((n, s) => n + (s.events || []).length, 0)} 个事件引用`);
+}
+
+/* ---------- map dynamics ---------- */
+const dynamics = loadGlobal("dynamics.js", "AXIS_DYNAMICS");
+if (dynamics) {
+  const routes = dynamics.routes || [];
+  const bases = dynamics.bases || [];
+  if (routes.length < 4) fail(`动态路线不足：${routes.length}`);
+  if (bases.length < 6) fail(`动态根据地不足：${bases.length}`);
+  for (const r of routes) {
+    if (!r.id || !r.name) fail("动态路线缺 id/name");
+    if (!(r.to >= r.from)) fail(`动态路线区间非法：${r.id}`);
+    if (!Array.isArray(r.points) || r.points.length < 2) fail(`动态路线缺坐标：${r.id}`);
+    for (const ll of r.points || []) if (!Array.isArray(ll) || ll.length !== 2 || !INSIDE(ll[0], ll[1])) fail(`动态路线坐标越界：${r.id}`);
+  }
+  for (const b of bases) {
+    if (!b.id || !b.name) fail("动态根据地缺 id/name");
+    if (!(b.to >= b.from)) fail(`动态根据地区间非法：${b.id}`);
+    if (!Array.isArray(b.lonlat) || b.lonlat.length !== 2 || !INSIDE(b.lonlat[0], b.lonlat[1])) fail(`动态根据地坐标越界：${b.id}`);
+  }
+  console.log(`地图动态层：${routes.length} 条路线 / ${bases.length} 个根据地`);
+}
+
 console.log("\n--- 校验结果 ---");
 for (const w of warnings) console.log("WARN  " + w);
 for (const e of errors) console.log("ERROR " + e);

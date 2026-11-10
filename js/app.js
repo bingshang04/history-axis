@@ -57,6 +57,7 @@
       Axis.theory.init();
       Axis.timeline.init();
       Axis.panels.init();
+      if (Axis.stages) Axis.stages.init();
       this.bind();
       this._searchIndex = D.searchIndex();
 
@@ -209,6 +210,13 @@
 
     var locate = U.$("#eventLocate");
     if (locate) locate.addEventListener("click", function () { self.flashPlayhead(); });
+
+    var stageBtn = U.$("#stageBtn");
+    if (stageBtn) stageBtn.addEventListener("click", function () {
+      if (!Axis.stages) return;
+      if (Axis.stages.isOpen()) Axis.stages.close();
+      else Axis.stages.open();
+    });
 
     document.addEventListener("keydown", function (e) { self.onKey(e); });
     window.addEventListener("hashchange", function () { self.applyHash(); });
@@ -655,15 +663,31 @@
     this.flashPlayhead();
   };
 
+  app.updateStageButton = function (open) {
+    var b = U.$("#stageBtn");
+    if (!b) return;
+    b.classList.toggle("active", !!open);
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+
   /* ---------------- 快捷键 ---------------- */
   app.onKey = function (e) {
     if (this._searchOpen) {
       if (e.key === "Escape") { e.preventDefault(); this.closeSearch(); }
       return;
     }
+    if (Axis.stages && Axis.stages.isOpen()) {
+      // 阶段图表自己处理 Esc / ← / →，避免同时改变年份
+      return;
+    }
     var tag = (e.target && e.target.tagName) || "";
     if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
     var key = e.key;
+    if (key === "g" || key === "G") {
+      e.preventDefault();
+      if (Axis.stages) Axis.stages.open();
+      return;
+    }
     if (key === " " || key === "Spacebar") {
       e.preventDefault();
       Axis.player.toggle();
