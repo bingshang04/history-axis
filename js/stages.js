@@ -68,6 +68,7 @@
     var s = id ? this.stageById(id) : null;
     if (!s) s = this.stageForYear(Axis.app ? Axis.app.state.year : 1855);
     if (!s) return;
+    if (Axis.compare && Axis.compare.isOpen()) Axis.compare.close();
     this.lastFocus = document.activeElement;
     this._open = true;
     this.activeId = s.id;

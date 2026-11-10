@@ -1,6 +1,6 @@
 {
   "name": "dsh-history-axis-viz",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "private": true,
   "type": "module",
   "description": "史纲·毛中特时间轴：中国近现代史纲要 × 毛中特 交互式考点可视化（Harness 插件入口）",

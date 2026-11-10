@@ -7,7 +7,7 @@
 <title>史纲 · 毛中特 时间轴 | 近现代史考点可视化</title>
 <meta name="description" content="中国近现代史纲要 × 毛泽东思想和中国特色社会主义理论体系概论 · 交互式时间轴与地图考点复习">
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/app.css?v=5">
+<link rel="stylesheet" href="css/app.css?v=7">
 </head>
 <body>
 <div class="app" id="app">
@@ -16,7 +16,7 @@
     <div class="brand">
       <div class="brand-year" id="bigYear">1840</div>
       <div class="brand-text">
-        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.1</span></div>
+        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.2</span></div>
         <div class="brand-sub" id="brandSub">上编 · 旧民主主义革命时期</div>
         <div class="brand-meta">近现代史纲要 × 毛中特 · 考点可视化复习</div>
       </div>
@@ -63,6 +63,10 @@
         <button class="stage-open-btn" id="stageBtn" title="阶段图表（快捷键 G）" aria-expanded="false">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13V8.5M6.5 13V4M10.5 13V10M14 13V6"/></svg>
           <span>阶段图表</span>
+        </button>
+        <button class="stage-open-btn compare-open-btn" id="compareBtn" title="考点对照（快捷键 C）" aria-expanded="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v9h-11zM2.5 6.5h11M2.5 9.5h11M6.5 3.5v9M10.5 3.5v9"/></svg>
+          <span>对照表</span>
         </button>
         <button class="search-btn" id="searchBtn" title="搜索考点（快捷键 /）">
           <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor"/><path d="M10.4 10.4 14 14" stroke="currentColor"/></svg>
@@ -237,7 +241,7 @@
   <footer class="statusbar">
     <span class="status-left">数据口径：2023 版《中国近现代史纲要》《毛中特》 · 仅供复习参考</span>
     <span class="status-mid" id="statusHint">空格 暂停/播放 · ←/→ 连续微调 · Shift+←/→ 5 年 · 地图区拖拽平移 / 滚轮缩放 · 时间轴拖拽扫年</span>
-    <span class="status-right">史纲 · 毛中特 时间轴 v1.0</span>
+    <span class="status-right">史纲 · 毛中特 时间轴 v1.2</span>
   </footer>
 </div>
 
@@ -265,6 +269,7 @@
       </div>
       <div class="stage-modal-head-right">
         <span class="stage-key-hint">G 打开 · ←/→ 切换</span>
+        <button class="stage-compare-link" id="stageCompareBtn" title="考点对照（C）">对照速查</button>
         <button class="stage-close" id="stageClose" title="关闭（Esc）">关闭</button>
       </div>
     </header>
@@ -279,23 +284,47 @@
   </div>
 </div>
 
+<div class="stage-overlay compare-overlay" id="compareOverlay" hidden>
+  <div class="stage-modal compare-modal" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+    <header class="stage-modal-head">
+      <div class="stage-modal-title-wrap">
+        <div class="stage-modal-kicker">考点对照 · 一页速查</div>
+        <h2 id="compareModalTitle">四张表，把易混点钉住</h2>
+        <p>先辨析土地、制度、著作、时间点，再回到阶段图表看全局。</p>
+      </div>
+      <div class="stage-modal-head-right">
+        <span class="stage-key-hint">C 打开 · ←/→ 换表</span>
+        <button class="stage-close" id="compareClose" title="关闭（Esc）">关闭</button>
+      </div>
+    </header>
+    <div class="compare-tabs" id="compareTabs" role="tablist" aria-label="考点对照分类"></div>
+    <div class="compare-body" id="compareBody"></div>
+    <footer class="stage-modal-foot">
+      <span>口径：2023 版《中国近现代史纲要》《毛中特》 · 徐涛强化班复盘笔记</span>
+      <span>对照表用于辨析易混点，具体表述以教材为准</span>
+    </footer>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
-<script src="data/china-geo.js?v=5"></script>
-<script src="data/shigang-periods.js?v=5"></script>
-<script src="data/shigang-events.js?v=5"></script>
-<script src="data/mao-data.js?v=5"></script>
-<script src="data/stages.js?v=5"></script>
-<script src="data/dynamics.js?v=5"></script>
-<script src="js/util.js?v=5"></script>
-<script src="js/data.js?v=5"></script>
-<script src="js/map.js?v=5"></script>
-<script src="js/theory.js?v=5"></script>
-<script src="js/timeline.js?v=5"></script>
-<script src="js/panels.js?v=5"></script>
-<script src="js/player.js?v=5"></script>
-<script src="js/stages.js?v=5"></script>
-<script src="js/app.js?v=5"></script>
+<script src="data/china-geo.js?v=7"></script>
+<script src="data/shigang-periods.js?v=7"></script>
+<script src="data/shigang-events.js?v=7"></script>
+<script src="data/mao-data.js?v=7"></script>
+<script src="data/stages.js?v=7"></script>
+<script src="data/dynamics.js?v=7"></script>
+<script src="data/compare.js?v=7"></script>
+<script src="js/util.js?v=7"></script>
+<script src="js/data.js?v=7"></script>
+<script src="js/map.js?v=7"></script>
+<script src="js/theory.js?v=7"></script>
+<script src="js/timeline.js?v=7"></script>
+<script src="js/panels.js?v=7"></script>
+<script src="js/player.js?v=7"></script>
+<script src="js/stages.js?v=7"></script>
+<script src="js/compare.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
 </body>
 </html>
 

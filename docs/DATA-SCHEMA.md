@@ -311,3 +311,28 @@ window.AXIS_DYNAMICS = {
 - 所有时间用 `axisYear(year, month) = year + (month-1)/12`，禁止直接写 `1948.11` 这类小数（会被解析为 1948.11 ≈ 1948.1）。
 - `routes.points` 为经纬度，渲染时经 `CHINA_GEO.project` 转为 SVG 坐标；`bases.lonlat` 同理。
 - 路线显隐：`year ∈ [from - 0.15, to + 0.45]`；根据地保留前后 ±0.3 年。
+## 8. 考点对照表
+
+### `window.AXIS_COMPARE`
+
+```js
+window.AXIS_COMPARE = {
+  meta: { source: "…", note: "…" },
+  tabs: [
+    {
+      id: "land", label: "土地纲领", kicker: "耕者有其田？",
+      title: "土地纲领对照", lead: "…",
+      columns: ["时间", "方案 / 文件", "耕者有其田", "封建土地剥削", "实施 / 性质"],
+      rows: [
+        { cells: ["1853", "《天朝田亩制度》", { t: "有（纲领）", tone: "partial" }, { t: "否定（纲领）", tone: "yes" }, "未实行…"] }
+      ]
+    }
+  ]
+};
+```
+
+- 四张表固定 id：`land`、`system`、`works`、`moments`。
+- `rows` 每行可以是数组，或 `{ cells }`；单元格可为字符串或 `{ t, tone }`。
+- `tone` 取 `yes | partial | no | neutral`，用于“有/部分/无/中性”的视觉标签。
+- 校验要求：4 张表、行数 13/6/25/32（`tools/verify_data.js`），行列数一致，`moments` 按年份升序，且含 1925 五卅“大革命高潮”定位。
+- 文案口径：教材 + 徐涛强化班复盘笔记；用于辨析，不替代教材原文。

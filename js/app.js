@@ -58,6 +58,7 @@
       Axis.timeline.init();
       Axis.panels.init();
       if (Axis.stages) Axis.stages.init();
+      if (Axis.compare) Axis.compare.init();
       this.bind();
       this._searchIndex = D.searchIndex();
 
@@ -670,10 +671,21 @@
     b.setAttribute("aria-expanded", open ? "true" : "false");
   };
 
+  app.updateCompareButton = function (open) {
+    var b = U.$("#compareBtn");
+    if (!b) return;
+    b.classList.toggle("active", !!open);
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+
   /* ---------------- 快捷键 ---------------- */
   app.onKey = function (e) {
     if (this._searchOpen) {
       if (e.key === "Escape") { e.preventDefault(); this.closeSearch(); }
+      return;
+    }
+    if (Axis.compare && Axis.compare.isOpen()) {
+      // 对照表自己处理 Esc / ← / →
       return;
     }
     if (Axis.stages && Axis.stages.isOpen()) {
@@ -686,6 +698,11 @@
     if (key === "g" || key === "G") {
       e.preventDefault();
       if (Axis.stages) Axis.stages.open();
+      return;
+    }
+    if (key === "c" || key === "C") {
+      e.preventDefault();
+      if (Axis.compare) Axis.compare.open();
       return;
     }
     if (key === " " || key === "Spacebar") {

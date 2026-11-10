@@ -254,6 +254,38 @@ if (dynamics) {
   console.log(`地图动态层：${routes.length} 条路线 / ${bases.length} 个根据地`);
 }
 
+/* ---------- compare atlas ---------- */
+const compare = loadGlobal("compare.js", "AXIS_COMPARE");
+if (compare) {
+  const tabs = compare.tabs || [];
+  const byId = new Map(tabs.map(t => [t.id, t]));
+  const expect = { land: 13, system: 6, works: 25, moments: 32 };
+  for (const [id, n] of Object.entries(expect)) {
+    const t = byId.get(id);
+    if (!t) { fail(`对照表缺少 ${id}`); continue; }
+    if ((t.rows || []).length !== n) fail(`对照表 ${id} 行数应为 ${n}，实际 ${(t.rows || []).length}`);
+    if (!Array.isArray(t.columns) || !t.columns.length) fail(`对照表 ${id} 缺表头`);
+    for (const row of t.rows || []) {
+      const cells = row.cells || row;
+      if (!Array.isArray(cells) || cells.length !== t.columns.length) fail(`对照表 ${id} 行列数不匹配`);
+    }
+  }
+  const moments = (byId.get("moments") || {}).rows || [];
+  let prev = 0;
+  for (const row of moments) {
+    const y = parseInt((row.cells || row)[0], 10);
+    if (!Number.isFinite(y)) fail("时间定位表年份非法");
+    else if (y < prev) fail(`时间定位表年份倒序：${y}`);
+    if (Number.isFinite(y)) prev = y;
+  }
+  const five = moments.find(row => String((row.cells || row)[0]) === "1925");
+  const fiveCells = five ? (five.cells || five) : [];
+  if (!five || !/五卅/.test(String(fiveCells[1] || "")) || !/高潮/.test(String(fiveCells[3] || ""))) {
+    fail("时间定位表缺少 1925 五卅“大革命高潮”定位");
+  }
+  console.log(`考点对照：${tabs.length} 张表 / ${tabs.reduce((n, t) => n + (t.rows || []).length, 0)} 行`);
+}
+
 console.log("\n--- 校验结果 ---");
 for (const w of warnings) console.log("WARN  " + w);
 for (const e of errors) console.log("ERROR " + e);
