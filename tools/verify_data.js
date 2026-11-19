@@ -286,6 +286,29 @@ if (compare) {
   console.log(`考点对照：${tabs.length} 张表 / ${tabs.reduce((n, t) => n + (t.rows || []).length, 0)} 行`);
 }
 
+/* ---------- theory profiles ---------- */
+const profiles = loadGlobal("theory-profiles.js", "THEORY_PROFILES");
+if (profiles) {
+  const list = profiles.profiles || [];
+  if (list.length !== 5) fail(`THEORY_PROFILES.profiles 应为 5 个，实际 ${list.length}`);
+  const byId = new Map(list.map(p => [p.id, p]));
+  for (const t of (mao && mao.theories) || []) {
+    if (!byId.has(t.id)) fail(`理论精讲缺少主线：${t.id}`);
+  }
+  for (const p of list) {
+    if (!p.id || !p.name) fail("理论精讲缺少 id/name");
+    for (const k of ["formation", "core", "significance"]) {
+      if (!p[k] || String(p[k]).length < 20) fail(`理论精讲 ${p.id} 的 ${k} 过短`);
+    }
+    if (!Array.isArray(p.main) || p.main.length < 4) fail(`理论精讲 ${p.id} 的 main 不足 4 条`);
+    if (!Array.isArray(p.works) || !p.works.length) fail(`理论精讲 ${p.id} 缺关键文献`);
+    if (!Array.isArray(p.pitfalls) || p.pitfalls.length < 2) fail(`理论精讲 ${p.id} 缺易混提醒`);
+    const related = ((mao && mao.nodes) || []).filter(n => n.theory === p.id);
+    if (!related.length) fail(`理论精讲 ${p.id} 没有关联理论节点`);
+  }
+  console.log(`理论精讲：${list.length} 个理论 / ${list.reduce((n, p) => n + (p.works || []).length, 0)} 条关键文献`);
+}
+
 console.log("\n--- 校验结果 ---");
 for (const w of warnings) console.log("WARN  " + w);
 for (const e of errors) console.log("ERROR " + e);

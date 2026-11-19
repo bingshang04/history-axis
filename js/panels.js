@@ -148,12 +148,21 @@
     return h;
   };
 
+  panels.theoryCta = function (theoryId) {
+    if (!theoryId) return "";
+    return '<button class="theory-cta" type="button" data-theory-deck="' + U.esc(theoryId) + '">' +
+      '<div><b>理论精讲 · 四步拆解</b><small>形成背景 / 核心思想 / 主要内容 / 地位意义</small></div>' +
+      '<span class="tc-arrow">→</span></button>';
+  };
+
   panels.theoryHtml = function (item, th, st) {
     var c = item.card || {};
     var h = this.topicRailHtml(item.theory);
+    h += this.theoryCta(item.theory);
     if (c.background) h += sec("形成背景", "<p>" + U.esc(c.background) + "</p>");
-    if (c.core) h += sec("核心内容", quote(c.core));
-    if (c.status) h += sec("历史地位", quote(c.status));
+    if (c.core) h += sec("核心思想", quote(c.core));
+    if (c.main && c.main.length) h += sec("主要内容", bullets(c.main));
+    if (c.status) h += sec("重要地位与意义", quote(c.status));
     if (c.points && c.points.length) h += sec("关键考点", bullets(c.points));
     if (c.pitfalls && c.pitfalls.length) h += sec("易错点", bullets(c.pitfalls, true));
     if (c.memory) h += sec("记忆锚点", '<div class="memory">' + U.esc(c.memory) + "</div>");
@@ -171,10 +180,12 @@
     var c = topic.card || {};
     var h = '<button class="topic-back" type="button" data-topic-back="1">‹ 返回理论坐标</button>';
     h += this.topicRailHtml(topic.theory, topic.id);
+    h += this.theoryCta(topic.theory);
     if (topic.summary) h += sec("专题概述", "<p>" + U.esc(topic.summary) + "</p>");
     if (c.background) h += sec("形成背景", "<p>" + U.esc(c.background) + "</p>");
-    if (c.core) h += sec("核心内容", quote(c.core));
-    if (c.status) h += sec("历史地位", quote(c.status));
+    if (c.core) h += sec("核心思想", quote(c.core));
+    if (c.main && c.main.length) h += sec("主要内容", bullets(c.main));
+    if (c.status) h += sec("重要地位与意义", quote(c.status));
     if (c.points && c.points.length) h += sec("关键考点", bullets(c.points));
     if (c.pitfalls && c.pitfalls.length) h += sec("易错点", bullets(c.pitfalls, true));
     if (c.memory) h += sec("记忆锚点", '<div class="memory">' + U.esc(c.memory) + "</div>");
@@ -207,7 +218,7 @@
       eyebrowEl.textContent = "理论总览";
       chipEl.textContent = "毛中特";
       titleEl.textContent = "马克思主义中国化时代化";
-      metaEl.innerHTML = '五条理论主线 · 1921—2025 · 点击专题进入考点';
+      metaEl.innerHTML = '五条理论主线 · 1921—2025 · 先看理论精讲，再点专题进入考点';
       var theories = Axis.data.theories;
       var list = theories.map(function (t) {
         var first = null;
@@ -220,6 +231,7 @@
       }).join("");
       contentEl.innerHTML =
         '<div class="overview"><div class="overview-quote">' + U.esc("马克思主义中国化时代化，就是把马克思主义基本原理同中国具体实际相结合、同中华优秀传统文化相结合，不断推进理论创新。") + "</div>" +
+        this.theoryCta("mao") +
         '<div class="sec"><div class="sec-label">五条主线</div><div class="overview-events">' + list + "</div></div>" +
         '<div class="sec"><div class="sec-label">理论专题</div>' +
         Axis.data.topics.map(function (t) {

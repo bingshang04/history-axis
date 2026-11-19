@@ -59,6 +59,7 @@
       Axis.panels.init();
       if (Axis.stages) Axis.stages.init();
       if (Axis.compare) Axis.compare.init();
+      if (Axis.theoryDeck) Axis.theoryDeck.init();
       this.bind();
       this._searchIndex = D.searchIndex();
 
@@ -678,6 +679,13 @@
     b.setAttribute("aria-expanded", open ? "true" : "false");
   };
 
+  app.updateTheoryButton = function (open) {
+    var b = U.$("#theoryBtn");
+    if (!b) return;
+    b.classList.toggle("active", !!open);
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+
   /* ---------------- 快捷键 ---------------- */
   app.onKey = function (e) {
     if (this._searchOpen) {
@@ -686,6 +694,10 @@
     }
     if (Axis.compare && Axis.compare.isOpen()) {
       // 对照表自己处理 Esc / ← / →
+      return;
+    }
+    if (Axis.theoryDeck && Axis.theoryDeck.isOpen()) {
+      // 理论精讲自己处理 Esc / ← / →
       return;
     }
     if (Axis.stages && Axis.stages.isOpen()) {
@@ -703,6 +715,11 @@
     if (key === "c" || key === "C") {
       e.preventDefault();
       if (Axis.compare) Axis.compare.open();
+      return;
+    }
+    if (key === "t" || key === "T") {
+      e.preventDefault();
+      if (Axis.theoryDeck) Axis.theoryDeck.open();
       return;
     }
     if (key === " " || key === "Spacebar") {

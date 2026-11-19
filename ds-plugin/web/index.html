@@ -7,7 +7,7 @@
 <title>史纲 · 毛中特 时间轴 | 近现代史考点可视化</title>
 <meta name="description" content="中国近现代史纲要 × 毛泽东思想和中国特色社会主义理论体系概论 · 交互式时间轴与地图考点复习">
 <link rel="icon" href="data:,">
-<link rel="stylesheet" href="css/app.css?v=7">
+<link rel="stylesheet" href="css/app.css?v=9">
 </head>
 <body>
 <div class="app" id="app">
@@ -16,7 +16,7 @@
     <div class="brand">
       <div class="brand-year" id="bigYear">1840</div>
       <div class="brand-text">
-        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.2</span></div>
+        <div class="brand-title">史纲 · 毛中特 <em>时间轴</em><span class="brand-ver">v1.3</span></div>
         <div class="brand-sub" id="brandSub">上编 · 旧民主主义革命时期</div>
         <div class="brand-meta">近现代史纲要 × 毛中特 · 考点可视化复习</div>
       </div>
@@ -67,6 +67,10 @@
         <button class="stage-open-btn compare-open-btn" id="compareBtn" title="考点对照（快捷键 C）" aria-expanded="false">
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v9h-11zM2.5 6.5h11M2.5 9.5h11M6.5 3.5v9M10.5 3.5v9"/></svg>
           <span>对照表</span>
+        </button>
+        <button class="stage-open-btn theory-open-btn" id="theoryBtn" title="理论精讲：形成背景 / 核心思想 / 主要内容 / 地位意义（快捷键 T）" aria-expanded="false">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.2h4.2c.7 0 1.3.6 1.3 1.3v8.3H3.8c-.7 0-1.3-.6-1.3-1.3zM13.5 3.2H9.3c-.7 0-1.3.6-1.3 1.3v8.3h4.2c.7 0 1.3-.6 1.3-1.3z"/></svg>
+          <span>理论精讲</span>
         </button>
         <button class="search-btn" id="searchBtn" title="搜索考点（快捷键 /）">
           <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor"/><path d="M10.4 10.4 14 14" stroke="currentColor"/></svg>
@@ -241,7 +245,7 @@
   <footer class="statusbar">
     <span class="status-left">数据口径：2023 版《中国近现代史纲要》《毛中特》 · 仅供复习参考</span>
     <span class="status-mid" id="statusHint">空格 暂停/播放 · ←/→ 连续微调 · Shift+←/→ 5 年 · 地图区拖拽平移 / 滚轮缩放 · 时间轴拖拽扫年</span>
-    <span class="status-right">史纲 · 毛中特 时间轴 v1.2</span>
+    <span class="status-right">史纲 · 毛中特 时间轴 v1.3</span>
   </footer>
 </div>
 
@@ -306,25 +310,51 @@
   </div>
 </div>
 
+<div class="stage-overlay theory-overlay" id="theoryOverlay" hidden>
+  <div class="stage-modal theory-modal" role="dialog" aria-modal="true" aria-labelledby="theoryModalTitle">
+    <header class="stage-modal-head">
+      <div class="stage-modal-title-wrap">
+        <div class="stage-modal-kicker">理论精讲 · 毛中特</div>
+        <h2 id="theoryModalTitle">五个理论，一条主线</h2>
+        <p>不是背时间线：每个理论都按「形成背景 → 核心思想 → 主要内容 → 地位意义」拆开看。</p>
+      </div>
+      <div class="stage-modal-head-right">
+        <span class="stage-key-hint">T 打开 · ←/→ 切换</span>
+        <button class="stage-close" id="theoryClose" title="关闭（Esc）">关闭</button>
+      </div>
+    </header>
+    <div class="theory-body">
+      <nav class="theory-nav" id="theoryNav" aria-label="理论主线"></nav>
+      <div class="theory-main" id="theoryMain"></div>
+    </div>
+    <footer class="stage-modal-foot">
+      <span>口径：2023 版《毛中特》教材 · 徐涛强化班复盘笔记</span>
+      <span>先讲清理论，再用时间轴看它何时形成、何时写入党章</span>
+    </footer>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
-<script src="data/china-geo.js?v=7"></script>
-<script src="data/shigang-periods.js?v=7"></script>
-<script src="data/shigang-events.js?v=7"></script>
-<script src="data/mao-data.js?v=7"></script>
-<script src="data/stages.js?v=7"></script>
-<script src="data/dynamics.js?v=7"></script>
-<script src="data/compare.js?v=7"></script>
-<script src="js/util.js?v=7"></script>
-<script src="js/data.js?v=7"></script>
-<script src="js/map.js?v=7"></script>
-<script src="js/theory.js?v=7"></script>
-<script src="js/timeline.js?v=7"></script>
-<script src="js/panels.js?v=7"></script>
-<script src="js/player.js?v=7"></script>
-<script src="js/stages.js?v=7"></script>
-<script src="js/compare.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="data/china-geo.js?v=9"></script>
+<script src="data/shigang-periods.js?v=9"></script>
+<script src="data/shigang-events.js?v=9"></script>
+<script src="data/mao-data.js?v=9"></script>
+<script src="data/theory-profiles.js?v=9"></script>
+<script src="data/stages.js?v=9"></script>
+<script src="data/dynamics.js?v=9"></script>
+<script src="data/compare.js?v=9"></script>
+<script src="js/util.js?v=9"></script>
+<script src="js/data.js?v=9"></script>
+<script src="js/map.js?v=9"></script>
+<script src="js/theory.js?v=9"></script>
+<script src="js/timeline.js?v=9"></script>
+<script src="js/panels.js?v=9"></script>
+<script src="js/player.js?v=9"></script>
+<script src="js/stages.js?v=9"></script>
+<script src="js/compare.js?v=9"></script>
+<script src="js/theory-deck.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
 

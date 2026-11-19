@@ -336,3 +336,34 @@ window.AXIS_COMPARE = {
 - `tone` 取 `yes | partial | no | neutral`，用于“有/部分/无/中性”的视觉标签。
 - 校验要求：4 张表、行数 13/6/25/32（`tools/verify_data.js`），行列数一致，`moments` 按年份升序，且含 1925 五卅“大革命高潮”定位。
 - 文案口径：教材 + 徐涛强化班复盘笔记；用于辨析，不替代教材原文。
+
+## 9. 理论精讲 `window.THEORY_PROFILES`
+
+```js
+window.THEORY_PROFILES = {
+  meta: { source: "…", note: "…" },
+  profiles: [
+    {
+      id: "mao",
+      name: "毛泽东思想",
+      short: "毛泽东思想",
+      years: "1921—1976",
+      chapter: "第一章",
+      color: "#c9a45c",
+      status: "马克思主义中国化第一次历史性飞跃",
+      formation: "形成背景……",
+      core: "核心思想……",
+      main: ["主要内容 1", "主要内容 2", "主要内容 3", "主要内容 4"],
+      significance: "重要地位与意义……",
+      works: ["《实践论》《矛盾论》", "中共七大"],
+      pitfalls: ["易混提醒 1", "易混提醒 2"]
+    }
+  ]
+};
+```
+
+- `profiles` 固定 5 个：`mao`、`deng`、`sanzhong`、`kexue`、`xijinping`，与 `MAO_DATA.theories` 一一对应。
+- 必填字段：`formation`、`core`、`significance`（均不少于 20 字符）、`main`（至少 4 条）、`works`（至少 1 条）、`pitfalls`（至少 2 条）。
+- 每个 profile 必须至少关联一个 `MAO_DATA.nodes` 节点，以支持“相关理论节点”定位。
+- 渲染：`js/theory-deck.js`；入口 `#theoryBtn`（仅毛中特 tab）、左栏 `data-theory-deck`、快捷键 `T`。
+- 内容口径：2023 版《毛中特》教材 + 徐涛强化班复盘笔记；用于建立“背景—核心—内容—意义”框架，不替代教材原文。
